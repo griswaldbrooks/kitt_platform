@@ -14,8 +14,6 @@ env:
     - ROS_DISTRO=indigo
     - ROS_CI_DESKTOP="`lsb_release -cs`"  # e.g. [precise|trusty|...]
     - CI_SRC_PATH=$(pwd)  
-  matrix:
-    - PLATFORMIO_CI_SRC=$CI_SRC_PATH/balor
 
 before_install:
     # Get roskeys
@@ -44,11 +42,6 @@ install:
     - rosdep update
     # Install platformio
     - pip install platformio
-    ### Get platformio libs.
-    # Install Timer.h library for easy ISRs.
-    # http://platformio.org/lib/show/75/Timer
-    # Pull in custom IMU libraries that use the i2c_t3.h instead of Timer.h
-    - platformio lib -g install 75 https://github.com/Teensy-Compatible-Libraries/lsm6-arduino.git https://github.com/Teensy-Compatible-Libraries/lis3mdl-arduino.git
 
 before_script:
     ### Build rosserial
@@ -61,18 +54,34 @@ before_script:
     - git clone https://github.com/ros-drivers/rosserial.git --branch $ROS_DISTRO-devel
     # Include custom kitt_msgs
     - git clone https://github.com/kittcar/kitt_msgs.git
+    # Build ros dependencies
     - cd ~/catkin_ws
     - catkin_make
     - source ~/catkin_ws/devel/setup.bash
-    # Make sketchbook/libraries folder.
-    - mkdir -p $CI_SRC_PATH/sketchbook/libraries
-    - export CI_LIB_PATH=$CI_SRC_PATH/sketchbook/libraries
-    # Make rosserial_arduino in the sketchbook/libraries folder
-    - rosrun rosserial_arduino make_libraries.py $CI_LIB_PATH
-    
+    # Build rosserial_arduino
+    - mkdir -p sketchbook/libraries
+    - export ROSSERIAL_LIB_PATH=$(cd sketchbook/libraries; pwd)
+    - rosrun rosserial_arduino make_libraries.py $ROSSERIAL_LIB_PATH
+    # Get catch2 for unit testing and symlink in repo
+    - cd src
+    - git clone https://github.com/kittcar/Catch2.git
+    - export CATCH2_SINGLE_INCLUDE_DIR=$(cd Catch2/single_include; pwd)
+    - ln -s $CI_SRC_PATH .
+
 script:
     # Build code
-    - platformio ci --lib="$CI_LIB_PATH/ros_lib" --board=teensy35 --board=teensy36
+    - cd ~/catkin_ws/src/kitt_platform/balor
+    - platformio run
+    # Build and run tests
+    - cd lib/balor
+    - mkdir build
+    - cd build
+    - cmake ..
+    - make
+    - make test
+
+after_failure:
+    - make check
 
 before_deploy:
     - sudo apt-get install -y doxygen
@@ -81,9 +90,10 @@ before_deploy:
 
 deploy:
     provider: s3
-    access_key_id: AKIAJPKG2OXAWEATAZHQ
+    access_key_id:
+        secure: l2lZWUZZs5KcTzrJcDj7ju0NZulH9iUewU1LnRjzJZiPWXWFleVVP64oHtbaJsmh2T8U+gp9GgG8mxPoJFZSO5b9vExqj5dcVBm0PYo/vaF/B5yYJfuV6gtl8/txd86gbfcUER3i2900oSNjyI2CmPZI5Zar67E+v2v2Gt+ezUDA9MZ4LLgwmlaJ9P2PqD6gwmB37tn+2r5spdjz5yVhZNwhkqDXR8i9z7OD25k+dsxN20akIX11BknFT7yhvAmm4nILM67Aj9wT8e2xMC0HirycAUBgW64EozcBRtPaoTrTeCIQ7w8FjlldsRd5QclLDhRkOMZu6+s7bGED/yQYhA9i60OszznY6OOt+Sc+BZrm4N3I5NIQnR4IbgzxLBQvJNyox2BbgPSfp3OCXq5gD5uYr51K2l+2cbjEpAT5fjLkdT9xV+0wKqMTjDrBL7gquCUEVpVLY4WlZyyztQMicJXC0XfL3KJ7/sW/OI38UzILFzfdEGUm3evBmxquV1/SwG7NQVa7ECifInYdH9zB5LlHxhZkMkeRzId/uoQt4qMEM+AGQwsXDWAHRoLIdQb/W9c/FfDB9qWM6gg23aUTCOPrnl41P6bpJbqu2OpAqqp3tADnjcCpsevjKrwX2twTyJ8B2RaAtRwu7iCAFqEXC2WgktfjmrPFbk5kulUfE+w=
     secret_access_key:
-        secure: WX6NSa1J/kTGTvBllB29Msk4gBAO5+D3F5kBEHxrxDdiSUY8eKaGibA76lm0dbcsNqfDJ23+pKRP9V7D4FCOw3/sF1KjF3u3Egq0rYs3bxe88uZIUuSD4B7uMz9AH3gVWLu40wWhd6ejBWHYvKRbflFw5oCc4Nxq70auW5HIHgxL2S+MIGURM+RcGwrAuWbedkLKbZKEAduAuW1x5kftO27LQSERHRnTP0xWT+1j96kpGuMwjGIbRztg9lLQZpWUz5BDypIDv4C9S/GNMtMQ013V+/5otEgPD2mcuxRPOkzZBU6IZUkO5iEIZH2Z1q2/XCumrR0p5TO2PMojzoCIYhtls8ewTi6el45b6A8gKlvFiZgHJ2Jkr0ixzqTjWUtTJsE7pIdbWXMqMm2xgiYS+6eeWb9l/l1t6DSpoDBtb2mno/U5sS9sX18UzdE6AFq8IbPVsHmF2q/Eg34vvortD/giB4J+bI33HGm8w6WVVc0+WSjbRkSuEm2b/Jg/5/Olw+Gy+MWPC/HbSS4HjucUw4B4sljO1wJyHAKcsey7aKPS0n07R0AMQEO9PKPem6I8jTfPAf4zre19yOfeuFYbQG5OdJYXvzhAeIf6JwqPR3onLsnx7rdEK44UGZ1N8Ad4Jc/KOeGCGq//QjCOnh1ze7vadY5hAhZzOgYz5/Mir3o=
+        secure: gJIfkUD5kjXK1zUETSkxMB+6Y8bsWLIK/0/reYXtfySHEIRL8gdFJkxWmQy1sGLzpcgdXKWZ7FZ8M1QkfsbU/diFQFJlfHLQT9T3NVJU55Q5XjaYMrX8UGo/AfXxjUjPgO0hZLN4/7GQTzqnnFY4qD+kUZ8SJewAKErkS0/RIuR8mNaZe+dbJKrEcEx1u0JKcYKeDtn2nIMbu3Udx9Sp/aiISrETFd4vsO2PdJyYuPhBrB5vM7Eu3awZq0f8I5tphKkfp71XcuJY9Q+b5E9/eE7kzRYvTwnveDHA/RneaBTKyJKiRP4NOkqDn9g0V3cO/I3B5M/PcUKocOJeQMQWnQ/Q/BmeZtz+o6a5tYWk8reVceYXqDd9+cvpdgYjFoAYnKs4ngfH+vmD4gvavKuT9+S/mYsnf3iqqw9y3T581VmvfkXCLnhzJSAA95crvT6xvg8oFlVGNwUpBM5ISsHgmZB2iPWl14DXCinq2SjVHDTWugV8z1NWWd9giPk/VzQbkXPhqCohIQkFEDCkBEnAt7uUVH+HTr3rA0dKDPWDFsclmv3E2VIrJ6AFCWRCsMVQNe1tlhEWZt8Z0U9bczWMH0rB76Kerr8fef9h1BOpA9nnovnoFz0zDdM2TEcncKhiNk9KvYwfKSKS80kus3y8sNFh4T6nlbUtkJpETrp9SEE=
     bucket: api.kittcar.com
     local-dir: "$CI_SRC_PATH/docs"
     upload-dir: kitt_platform

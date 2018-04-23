@@ -20,6 +20,7 @@
 #include <std_msgs/Empty.h>
 #include <std_msgs/String.h>
 #include <ackermann_msgs/AckermannDrive.h>
+#include <balor.h>
 
 // C++ includes
 #include <math.h>
