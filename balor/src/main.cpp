@@ -21,6 +21,7 @@
 #include <std_msgs/String.h>
 #include <ackermann_msgs/AckermannDrive.h>
 #include <balor.h>
+#include <diffdrive.h>
 
 // C++ includes
 #include <math.h>
@@ -60,6 +61,7 @@ bool params_retrieved_successfully = true;
  */
 void listenerCallback(const std_msgs::Empty& listener_msg)
 {
+  kitt_platform::to_wheel_velocity(0, 0, NULL, NULL);
   uint8_t toggled_led_state;
   if (digitalRead(LED_PIN) == HIGH)
   {
