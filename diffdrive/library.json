@@ -1,0 +1,27 @@
+{
+    "name": "diffdrive",
+    "keywords": "diffdrive, kittcar",
+    "description": "Library for differential drive",
+    "repository":
+    {
+        "type": "git",
+        "url": "https://github.com/kittcar/kitt_platform.git"
+    },
+    "authors":
+    [
+        {
+            "name": "Griswald Brooks",
+            "email": "griswald.brooks@gmail.com",
+            "url": "http://www.griswaldbrooks.com",
+            "maintainer": true
+        },
+        {
+            "name": "Kiran Mohan",
+            "email": "kmohan@wpi.edu",
+            "maintainer": true
+        }
+    ],
+    "version": "3.7.7",
+    "frameworks": "arduino",
+    "platforms": "teensy"
+}
