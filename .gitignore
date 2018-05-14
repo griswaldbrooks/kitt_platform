@@ -1,2 +1,6 @@
 *.swp
+*.swo
 docs/
+build/
+bin/
+lib/
