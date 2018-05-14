@@ -12,7 +12,8 @@ env:
   - ROS_CI_DESKTOP="`lsb_release -cs`"
   - CI_SRC_PATH=$(pwd)
 before_install:
-- sudo sh -c "echo \"deb http://packages.ros.org/ros/ubuntu $ROS_CI_DESKTOP main\" > /etc/apt/sources.list.d/ros-latest.list"
+- sudo sh -c "echo \"deb http://packages.ros.org/ros/ubuntu $ROS_CI_DESKTOP main\"
+  > /etc/apt/sources.list.d/ros-latest.list"
 - wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
 - sudo apt-get -qq update
 install:
@@ -66,9 +67,9 @@ before_deploy:
 - doxygen
 deploy:
   provider: s3
-  access_key_id: AKIAIUNIICAKULW4NFWQ
+  access_key_id: AKIAJCAG4GDO3A32L3KA
   secret_access_key:
-    secure: a80qS+i0tUxCyaz00uDxd5uiGWYgG6V329YVvi/Dh6DM24N+z3ACLNrZQAnxwIsPqZJtUPo83u8apWT0hRwyTeMjzg39EjDWxU8rM4bV6U6+6uivL3dYsh0pbTJG7MQAWvgVoLo9uqOL1hI8zIWmkdkWCyQr1FmBEBZzpTsZLAs5rwF063GGPWCgmi2mgHnxTqGY0J1xocqC5lT5zrZ67zHHh/baTgi1GNKZn8/D3SqZ7+U0MUyI/DGv30gOzcqut/1t8+sKx2P62Q4meksPw8aeNf/8FGnBcz96ZQohcets4X1oyrYGpoSQrGA7As6Pscx4+aZauGxKa9tQ1l89YS/DzDEOE7dJ91prarXj3cPk5MpjVuqSn20iFy2rg8Qv6jFPG6ShE1ZCrx7DaqSqWIl+u6zJv/6AjRwRUdMwzFLgy3LJ4OU0Hhz3gIA7a3kYJm9rmRjw0YrhEZI80fyKpyzTdwbWFkFyE3GiDXYJ3qW7K+Ey9sKhGjkpPvqqOKytPCZ2EQCiZXBR0gZMJjKdKY+lrYMvdzYdSqPk2Iw+hEVObKRa2/0CGIrzUSZy9eEB6Y9IZ7i3AH362JuNnLqShUbagDFjYPYI7UVlDfatd/WHIKM/khjsocIHmtlJiQ/ZP/sqdwXcCX8i139t2AAyKlHtPYnouQRgZ1LVGLckcnw=
+    secure: ecxONNRrPgPNkr52dDZdRY1J9NolJDMa3Odz4lW8nT5hkkhE6/0AOgnrJXPCDD300+W3FRdtemg0bws8xKsxdSnhfTxaYF83QO2epdSoitttu3eiKYhUL7vvqek/06lQdGZtaN8myIL7JoaNh5ug66aNU/Mf73Fn/MuiVEHcHjz1yb/rgd2PtTeP5348FAhNl2W1/ON+ojMnlZMa0dORgDMrrnhUXk+URokIp19ilmX+DkkEQeihpF+wwWpwrwiThKPEODRPiliNExaTur6NDarjBvGkfpnD/sYw/xF/v/Q/l+JAwZbPNlTd5NDCtenQqXnyuleT0foUA4pIFv1mP1SicH72QtYKI2hJB5woKQRC5NAZywyvmv/pxP8vRyvA9I09wX6sp47IcdFJGB8igMbSP4ZxI0g3wd1Apk5yXjZbrmWhfTmV0TmLwYJsMSw10CHJXwYwoZ/ROUay4584yFmLHPruD4NWDiZptRtzclkLCpwuslNOaTbMAKBskNYkYNDVH0b1tWTaRqH30vqX40sZjCFZOnDLc/HUupVfJhVOHZi32fGSIbVqK50jg85ttII7OH4DaT0TvkGyExmq9bZrDtE1wlWEqSe8TFQAcabWsa37tYlKZb0sxIg3KqiRu/Pt2p2rBeYlbHVVen0c19kSC9PvNEQ0IxtCsBZyK7A=
   bucket: api.kittcar.com
   local-dir: "$CI_SRC_PATH/docs"
   upload-dir: kitt_platform
