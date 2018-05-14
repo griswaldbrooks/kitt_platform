@@ -67,11 +67,11 @@ before_deploy:
 - doxygen
 deploy:
   provider: s3
-  access_key_id: "AKIAJCAG4GDO3A32L3KA"
+  access_key_id: AKIAJCAG4GDO3A32L3KA
   secret_access_key:
-    secure: "QqRSXdtjdoHe7DbfHI0To+O3RcMW0jiwGaNqTtKUoSVlbPXB/SK/rZLsTbjV07y+F/jSdUWoOgK6IOw/WCX/4D+J6fryIZ4aDAtUeGQUIT0XM1EkNwCZpuRd2rCrQBBd3RhaqPazC7pJ/cagE+Sf01slY5mgDQjO2og6b3v9tgyIZwfTWFoOhM0urkLPVRlGd+lmG3DY/rVKHMJ7A4+kFjPWr/EroCN31iqh3euUk4gzuBgMQE9JXyc4114347r4PsQ/GqJHjLv4WZCAAxlHT2nVOk9wdi6fyiMf4KXqKWIAM9JV7oiJs8tCJf8IPqb9nGAHyhW2lB9gFOuA42v8Nr0eC2jvp7o2LofoRCw0OuoyKqxQcD4uAgyzSYJfGkRytFrclFDIXZN8tODBBKd3QyN0aDUca7+N4hgc8xJGg/BJb0kjc8cLGOcpYuQ8cqZPhZK+xBiik5hD7S9/TGgouZvISjffhVigYHGSc/q5yeYdsLnNeSN+3LZb7POpgunx56vGeA3Z2LdG1JLZnx6FRP3SCR2dmUQImLEKUdoMzaeNJzfoUAcx03FinRAfLBWEaNYbcPn8IgGU95J5fNPBg47YbOsSlEzVrhq24rDVCxvbzcVh1JzD4Kav1iT2SLl7CQh6FKF/qvVbGbGwVgjosj8be0Oivcg+BnVHgcSZ3vU=" 
+    secure: TiRn/uD/x/Px/q8rlkN54cud9YzG9dwjBc3ZP47KEQkWcZJWEmAUYzi7WVusqExAVK7A7TOsN0SItDKT/0GD0zJMrqgowAOSACPL8xPmUvKHDLqw6p14J/79O76+NVP3Q5X/InYMPtZwwu/6LvKJ3PVVMlwsKUWWhjgUvjpM6hExSMKPm59FBJ4S/M01rZ/AqFYCj6TrIO6nlMS4tgODmMpdJ5bmQnevJb19ugfxAi6MPoDKwok9evdKgkpviWvhLhYBvG7B+7OjzbMC8upYjkhtv91WKlCEhAkf5mAXbvZ4uDLtAuVqzP0XDM53ZhOirtrgd2brY5KBLN2ecn8nXV/A/CYp6V/7QUCI15uQaEf99GQOxj2IQUnpvfhPss4/+67fyuJqfOdXJPHWPzCzs/Rg1kyypd3ydos3qzIbKBjb+/DSbnMQuVYsI35Zg+vSX/ARU6DthfEXD3r77p3PTka67NnF5KlhTCM4MWT8e+l+3jfqTURMnKIHvuKm4AnC05//fn3IU3TaIG01qumppxVNq6Tfe98tJZQOOs8lsEAGYfgGvh4+DLA21uhUvBvK+EyJqufT8fU7e/aqnWnKZ4c82ICVDbOquTsV0H/GdXF2m3PoP/8a9P34YSPF/OBDMuXBfafuhF//8SZEbEfh3dazzz7g0WIiNE2AJOZE00M=
   bucket: api.kittcar.com
-  local-dir: "$CI_SRC_PATH/docs"
+  local-dir: '$CI_SRC_PATH/docs'
   upload-dir: kitt_platform
   skip_cleanup: true
   region: us-west-1
