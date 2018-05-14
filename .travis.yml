@@ -2,102 +2,78 @@ dist: trusty
 sudo: required
 language: python
 python:
-    - 2.7
-
+- 2.7
 cache:
-    directories:
-        - "~/.platformio"
-
-# Configuration variables.
+  directories:
+  - "~/.platformio"
 env:
   global:
-    - ROS_DISTRO=indigo
-    - ROS_CI_DESKTOP="`lsb_release -cs`"  # e.g. [precise|trusty|...]
-    - CI_SRC_PATH=$(pwd)  
-
+  - ROS_DISTRO=indigo
+  - ROS_CI_DESKTOP="`lsb_release -cs`"
+  - CI_SRC_PATH=$(pwd)
 before_install:
-    # Get roskeys
-    - sudo sh -c "echo \"deb http://packages.ros.org/ros/ubuntu $ROS_CI_DESKTOP main\" > /etc/apt/sources.list.d/ros-latest.list"
-    - wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
-    - sudo apt-get -qq update
-
+- sudo sh -c "echo \"deb http://packages.ros.org/ros/ubuntu $ROS_CI_DESKTOP main\" > /etc/apt/sources.list.d/ros-latest.list"
+- wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
+- sudo apt-get -qq update
 install:
-    # Install minimum amount of ROS to get things working for rosserial.
-    - sudo apt-get install -y ros-$ROS_DISTRO-catkin
-    - sudo apt-get install -y python-rosdep
-    - sudo apt-get install -y ros-$ROS_DISTRO-rosbash
-    - sudo apt-get install -y ros-$ROS_DISTRO-roscpp
-    - sudo apt-get install -y ros-$ROS_DISTRO-roslib
-    - sudo apt-get install -y ros-$ROS_DISTRO-rospy
-    - sudo apt-get install -y ros-$ROS_DISTRO-common-msgs
-    - sudo apt-get install -y ros-$ROS_DISTRO-topic-tools
-    - sudo apt-get install -y ros-$ROS_DISTRO-tf
-    - sudo apt-get install -y ros-$ROS_DISTRO-ackermann-msgs
-    - pip install -U rospkg
-    - pip install -U catkin_pkg
-    - pip install -U empy
-    - source /opt/ros/$ROS_DISTRO/setup.bash
-    # Prepare rosdep to install dependencies.
-    - sudo rosdep init
-    - rosdep update
-    # Install platformio
-    - pip install platformio
-
+- sudo apt-get install -y ros-$ROS_DISTRO-catkin
+- sudo apt-get install -y python-rosdep
+- sudo apt-get install -y ros-$ROS_DISTRO-rosbash
+- sudo apt-get install -y ros-$ROS_DISTRO-roscpp
+- sudo apt-get install -y ros-$ROS_DISTRO-roslib
+- sudo apt-get install -y ros-$ROS_DISTRO-rospy
+- sudo apt-get install -y ros-$ROS_DISTRO-common-msgs
+- sudo apt-get install -y ros-$ROS_DISTRO-topic-tools
+- sudo apt-get install -y ros-$ROS_DISTRO-tf
+- sudo apt-get install -y ros-$ROS_DISTRO-ackermann-msgs
+- pip install -U rospkg
+- pip install -U catkin_pkg
+- pip install -U empy
+- source /opt/ros/$ROS_DISTRO/setup.bash
+- sudo rosdep init
+- rosdep update
+- pip install platformio
 before_script:
-    ### Build rosserial
-    # Initialize catkin workspace for custom rosserial build.
-    - mkdir -p ~/catkin_ws/src
-    - cd ~/catkin_ws/src
-    - catkin_init_workspace
-    # Pull in custom rosserial because PR https://github.com/ros-drivers/rosserial/pull/270
-    # hasn't made it to the debs yet. When it does, this should be removed.
-    - git clone https://github.com/ros-drivers/rosserial.git --branch $ROS_DISTRO-devel
-    # Include custom kitt_msgs
-    - git clone https://github.com/kittcar/kitt_msgs.git
-    # Build ros dependencies
-    - cd ~/catkin_ws
-    - catkin_make
-    - source ~/catkin_ws/devel/setup.bash
-    # Build rosserial_arduino
-    - mkdir -p sketchbook/libraries
-    - export ROSSERIAL_LIB_PATH=$(cd sketchbook/libraries; pwd)
-    - rosrun rosserial_arduino make_libraries.py $ROSSERIAL_LIB_PATH
-    # Get catch2 for unit testing and symlink in repo
-    - cd src
-    - git clone https://github.com/kittcar/Catch2.git
-    - export CATCH2_SINGLE_INCLUDE_DIR=$(cd Catch2/single_include; pwd)
-    - ln -s $CI_SRC_PATH .
-
+- mkdir -p ~/catkin_ws/src
+- cd ~/catkin_ws/src
+- catkin_init_workspace
+- git clone https://github.com/ros-drivers/rosserial.git --branch $ROS_DISTRO-devel
+- git clone https://github.com/kittcar/kitt_msgs.git
+- cd ~/catkin_ws
+- catkin_make
+- source ~/catkin_ws/devel/setup.bash
+- mkdir -p sketchbook/libraries
+- export ROSSERIAL_LIB_PATH=$(cd sketchbook/libraries; pwd)
+- rosrun rosserial_arduino make_libraries.py $ROSSERIAL_LIB_PATH
+- cd src
+- git clone https://github.com/kittcar/Catch2.git
+- export CATCH2_SINGLE_INCLUDE_DIR=$(cd Catch2/single_include; pwd)
+- ln -s $CI_SRC_PATH .
 script:
-    # Build code
-    - cd ~/catkin_ws/src/kitt_platform/balor
-    - platformio run
-    # Build and run tests
-    - cd lib/balor
-    - mkdir build
-    - cd build
-    - cmake ..
-    - make
-    - make test
-
+- cd ~/catkin_ws/src/kitt_platform/balor
+- platformio run
+- cd lib/balor
+- mkdir build
+- cd build
+- cmake ..
+- make
+- make test
 after_failure:
-    - make check
-
+- make check
 before_deploy:
-    - sudo apt-get install -y doxygen
-    - cd $CI_SRC_PATH
-    - doxygen
-
+- sudo apt-get install -y doxygen
+- cd $CI_SRC_PATH
+- doxygen
 deploy:
-    provider: s3
-    access_key_id: AKIAIS6JT3HRB7DPEO3A
-    secret_access_key:
-        secure: gJIfkUD5kjXK1zUETSkxMB+6Y8bsWLIK/0/reYXtfySHEIRL8gdFJkxWmQy1sGLzpcgdXKWZ7FZ8M1QkfsbU/diFQFJlfHLQT9T3NVJU55Q5XjaYMrX8UGo/AfXxjUjPgO0hZLN4/7GQTzqnnFY4qD+kUZ8SJewAKErkS0/RIuR8mNaZe+dbJKrEcEx1u0JKcYKeDtn2nIMbu3Udx9Sp/aiISrETFd4vsO2PdJyYuPhBrB5vM7Eu3awZq0f8I5tphKkfp71XcuJY9Q+b5E9/eE7kzRYvTwnveDHA/RneaBTKyJKiRP4NOkqDn9g0V3cO/I3B5M/PcUKocOJeQMQWnQ/Q/BmeZtz+o6a5tYWk8reVceYXqDd9+cvpdgYjFoAYnKs4ngfH+vmD4gvavKuT9+S/mYsnf3iqqw9y3T581VmvfkXCLnhzJSAA95crvT6xvg8oFlVGNwUpBM5ISsHgmZB2iPWl14DXCinq2SjVHDTWugV8z1NWWd9giPk/VzQbkXPhqCohIQkFEDCkBEnAt7uUVH+HTr3rA0dKDPWDFsclmv3E2VIrJ6AFCWRCsMVQNe1tlhEWZt8Z0U9bczWMH0rB76Kerr8fef9h1BOpA9nnovnoFz0zDdM2TEcncKhiNk9KvYwfKSKS80kus3y8sNFh4T6nlbUtkJpETrp9SEE=
-    bucket: api.kittcar.com
-    local-dir: "$CI_SRC_PATH/docs"
-    upload-dir: kitt_platform
-    skip_cleanup: true
-    region: us-west-1
-    acl: public_read
-    on:
-        repo: kittcar/kitt_platform
+  provider: s3
+  access_key_id: AKIAIUNIICAKULW4NFWQ
+  secret_access_key:
+    secure: a80qS+i0tUxCyaz00uDxd5uiGWYgG6V329YVvi/Dh6DM24N+z3ACLNrZQAnxwIsPqZJtUPo83u8apWT0hRwyTeMjzg39EjDWxU8rM4bV6U6+6uivL3dYsh0pbTJG7MQAWvgVoLo9uqOL1hI8zIWmkdkWCyQr1FmBEBZzpTsZLAs5rwF063GGPWCgmi2mgHnxTqGY0J1xocqC5lT5zrZ67zHHh/baTgi1GNKZn8/D3SqZ7+U0MUyI/DGv30gOzcqut/1t8+sKx2P62Q4meksPw8aeNf/8FGnBcz96ZQohcets4X1oyrYGpoSQrGA7As6Pscx4+aZauGxKa9tQ1l89YS/DzDEOE7dJ91prarXj3cPk5MpjVuqSn20iFy2rg8Qv6jFPG6ShE1ZCrx7DaqSqWIl+u6zJv/6AjRwRUdMwzFLgy3LJ4OU0Hhz3gIA7a3kYJm9rmRjw0YrhEZI80fyKpyzTdwbWFkFyE3GiDXYJ3qW7K+Ey9sKhGjkpPvqqOKytPCZ2EQCiZXBR0gZMJjKdKY+lrYMvdzYdSqPk2Iw+hEVObKRa2/0CGIrzUSZy9eEB6Y9IZ7i3AH362JuNnLqShUbagDFjYPYI7UVlDfatd/WHIKM/khjsocIHmtlJiQ/ZP/sqdwXcCX8i139t2AAyKlHtPYnouQRgZ1LVGLckcnw=
+  bucket: api.kittcar.com
+  local-dir: "$CI_SRC_PATH/docs"
+  upload-dir: kitt_platform
+  skip_cleanup: true
+  region: us-west-1
+  acl: public_read
+  on:
+    repo: kittcar/kitt_platform
