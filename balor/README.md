@@ -1,11 +1,11 @@
-#Balor
+# Balor
 Single camera ackermann drive embedded platform.
 
-##kitt_msgs
+## kitt_msgs
 
 git clone https://github.com/kittcar/kitt_msgs.git
 
-##rosserial_arduino
+## rosserial_arduino
 To interface with ROS, [rosserial_arduino](http://wiki.ros.org/rosserial_arduino) is used.
 It needs to be built from source, due to lack of support for the teensy in the debians (https://forum.pjrc.com/threads/40418-rosserial_arduino-for-Teensy).
 ```
@@ -22,13 +22,13 @@ rosrun rosserial_arduino make_libraries.py sketchbook/libraries
 ```
 [Export library location to environment.](#rosserial-library)
 
-##rosserial kinetic jade
+## rosserial kinetic jade
 For ROS Kinetic, the Jade branch of rosserial should be used.
 ```
 git clone https://github.com/ros-drivers/rosserial.git --branch jade-devel
 ```
 
-##catch2
+## catch2
 [Catch2](https://github.com/catchorg/Catch2) is a cpp unit testing framework which supports [BDD](https://en.wikipedia.org/wiki/Behavior-driven_development).
 It is a header only library which is used for unit testing.
 It is recommended to be cloned into the `catkin_ws/src` directory but is not required.
@@ -38,21 +38,21 @@ git clone https://github.com/kittcar/Catch2.git
 ```
 [Export header location to environment.](#catch2-single-include)
 
-##Environment Variables
-###rosserial library
+## Environment Variables
+### rosserial library
 To build for the platform, the location of the rosserial libraries needs to be exported.
 ```
 export ROSSERIAL_LIB_PATH=$(cd path/to/libraries; pwd)
 ```
 
-###catch2 single include
+### catch2 single include
 To build unit tests, the directory of the single header version of catch2 needs
 to be exported.
 ```
 export CATCH2_SINGLE_INCLUDE_DIR=$(cd path/to/Catch2/single_include; pwd)
 ```
 
-##platformio
+## platformio
 [Platform IO](https://platformio.org/) is a build system for embedded projects which supports our directory structure and is community friendly.
 It can be installed with
 ```
@@ -81,9 +81,9 @@ To see the test results in more detail, a custom build target is used.
 make check
 ```
 
-#Appendix
+# Appendix
 
-##Initialize Catkin Workspace
+## Initialize Catkin Workspace
 Balor is dependent on [ros](http://www.ros.org/).
 The rosserial libraries must be built and then linked in.
 These dependencies must be built in a [catkin workspace](http://wiki.ros.org/catkin/Tutorials/create_a_workspace).
