@@ -17,7 +17,7 @@ target_link_libraries(${TARGET_NAME}
 
 # Testing library needs to be cloned to the name directory as the project repo.
 target_include_directories(${TARGET_NAME}
-    PUBLIC ../../Catch2/single_include)
+  PUBLIC $ENV{CATCH2_SINGLE_INCLUDE_DIR})
                  
 add_test(
     NAME ${TARGET_NAME}
